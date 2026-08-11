@@ -1,0 +1,7 @@
+---
+- name: Configure NFS clients
+  hosts: "{{ target_host }}"
+  become: true
+
+  roles:
+    - role: nfs-client
