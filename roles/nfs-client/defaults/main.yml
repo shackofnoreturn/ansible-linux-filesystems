@@ -1,0 +1,4 @@
+---
+nfs_client_package: nfs-common
+
+nfs_mounts: []
