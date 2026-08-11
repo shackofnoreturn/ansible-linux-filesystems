@@ -30,19 +30,3 @@
   ansible.builtin.systemd_service:
     daemon_reload: true
   become: true
-
-- name: Determine automount unit names
-  ansible.builtin.command:
-    cmd: "systemd-escape --path --suffix=automount {{ item.mountpoint }}"
-  loop: "{{ nfs_mounts }}"
-  register: nfs_automount_units
-  changed_when: false
-  become: true
-
-- name: Enable NFS automount units
-  ansible.builtin.systemd_service:
-    name: "{{ item.stdout }}"
-    enabled: true
-    state: started
-  loop: "{{ nfs_automount_units.results }}"
-  become: true

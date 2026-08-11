@@ -6,10 +6,9 @@ nfs_mount_defaults:
   options:
     - rw
     - hard
+    - bg
     - _netdev
     - nofail
-    - x-systemd.automount
-    - x-systemd.idle-timeout=0
     - timeo=600
     - retrans=2
 
