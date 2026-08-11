@@ -1,4 +1,16 @@
 ---
 nfs_client_package: nfs-common
 
+nfs_mount_defaults:
+  fstype: nfs4
+  options:
+    - rw
+    - hard
+    - _netdev
+    - nofail
+    - x-systemd.automount
+    - x-systemd.idle-timeout=0
+    - timeo=600
+    - retrans=2
+
 nfs_mounts: []

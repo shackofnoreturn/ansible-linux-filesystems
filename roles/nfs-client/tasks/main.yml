@@ -10,9 +10,9 @@
   ansible.builtin.file:
     path: "{{ item.mountpoint }}"
     state: directory
-    owner: root
-    group: root
-    mode: "0755"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
   loop: "{{ nfs_mounts }}"
   become: true
 
@@ -20,8 +20,8 @@
   ansible.posix.mount:
     path: "{{ item.mountpoint }}"
     src: "{{ item.server }}:{{ item.export }}"
-    fstype: nfs4
-    opts: "_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=0"
+    fstype: "{{ item.fstype | default(nfs_mount_defaults.fstype) }}"
+    opts: "{{ item.options | default(nfs_mount_defaults.options) | join(',') }}"
     state: present
   loop: "{{ nfs_mounts }}"
   become: true
