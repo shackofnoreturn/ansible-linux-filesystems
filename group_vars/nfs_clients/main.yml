@@ -1,36 +1,36 @@
 ---
 nfs_mounts:
 
-  - server: shack-fil-p001
+  - server: 10.0.0.11
     export: /mnt/datapool01/services
     mountpoint: /mnt/datapool01/services
 
-  - server: shack-fil-p001
+  - server: 10.0.0.11
     export: /mnt/datapool01/data
     mountpoint: /mnt/datapool01/data
 
-  - server: shack-fil-p001
+  - server: 10.0.0.11
     export: /mnt/ssdpool01/services
     mountpoint: /mnt/ssdpool01/services
 
-  - server: shack-fil-p002
+  - server: 10.0.0.21
     export: /mnt/datapool02/media
     mountpoint: /mnt/datapool02/media
 
-  - server: shack-fil-p002
+  - server: 10.0.0.21
     export: /mnt/datapool02/downloads
     mountpoint: /mnt/datapool02/downloads
 
-  - server: shack-fil-p002
+  - server: 10.0.0.21
     export: /mnt/datapool02/backup
     mountpoint: /mnt/datapool02/backup
 
-  - server: shack-fil-p002
+  - server: 10.0.0.21
     export: /mnt/datapool02/xxx
     mountpoint: /mnt/datapool02/xxx
 
   # Ex: Mount with different retry behavior
-  # - server: shack-fil-p002
+  # - server: 10.0.0.21
   #   export: /mnt/datapool02
   #   mountpoint: /mnt/datapool02
   #   options:
