@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
+
+- name: Reload NFS exports
+  ansible.builtin.command:
+    cmd: exportfs -ra
+  become: true

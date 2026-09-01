@@ -4,12 +4,8 @@ nfs_client_package: nfs-common
 nfs_mount_defaults:
   fstype: nfs4
   options:
-    - rw
-    - hard
-    - bg
+    - defaults
     - _netdev
-    - nofail
-    - timeo=600
-    - retrans=2
+    - nofail    
 
 nfs_mounts: []

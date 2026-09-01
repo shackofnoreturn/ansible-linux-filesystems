@@ -10,3 +10,6 @@
 
 ## Todo
 - [ ] Provision client shack-app-d001 with already existing NFS shares
+
+## Note
+- Proxmox LXC: Turn on nesting

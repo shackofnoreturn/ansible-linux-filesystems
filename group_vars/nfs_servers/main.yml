@@ -1,0 +1,27 @@
+---
+nfs_storage_mounts:
+  - /mnt/datapool02
+
+nfs_storage_recovery_interval: "30s"
+
+nfs_exports:
+
+  - path: /mnt/datapool02/media
+    clients:
+      - network: 10.0.0.0/24
+        options: rw,sync,no_subtree_check,no_root_squash
+
+  - path: /mnt/datapool02/downloads
+    clients:
+      - network: 10.0.0.0/24
+        options: rw,sync,no_subtree_check,no_root_squash
+
+  - path: /mnt/datapool02/backup
+    clients:
+      - network: 10.0.0.0/24
+        options: rw,sync,no_subtree_check,no_root_squash
+
+  - path: /mnt/datapool02/xxx
+    clients:
+      - network: 10.0.0.0/24
+        options: rw,sync,no_subtree_check,no_root_squash

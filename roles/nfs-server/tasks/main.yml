@@ -1,0 +1,101 @@
+---
+- name: Install NFS server
+  ansible.builtin.apt:
+    name: "{{ nfs_server_package }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Stop NFS server before validating storage
+  ansible.builtin.systemd_service:
+    name: nfs-server
+    state: stopped
+  become: true
+
+- name: Check NFS export paths are mounted
+  ansible.builtin.command:
+    cmd: "mountpoint -q {{ item.path }}"
+  loop: "{{ nfs_exports }}"
+  register: nfs_export_mounts
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Stop NFS server when export storage is unavailable
+  ansible.builtin.systemd_service:
+    name: nfs-server
+    state: stopped
+  when:
+    - nfs_export_mounts.results
+        | selectattr('rc', 'ne', 0)
+        | list
+        | length > 0
+  become: true
+
+- name: Refuse to configure exports for unmounted filesystems
+  ansible.builtin.fail:
+    msg: >-
+      NFS export {{ item.item.path }} is not mounted.
+      Refusing to export the directory.
+      Is the JBOD/storage online?
+  loop: "{{ nfs_export_mounts.results }}"
+  when: item.rc != 0
+
+- name: Configure NFS exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload NFS exports
+  become: true
+
+- name: Configure NFS storage recovery script
+  ansible.builtin.template:
+    src: nfs-storage-recovery.sh.j2
+    dest: /usr/local/sbin/nfs-storage-recovery
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Configure NFS storage recovery service
+  ansible.builtin.template:
+    src: nfs-storage-recovery.service.j2
+    dest: /etc/systemd/system/nfs-storage-recovery.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+  become: true
+
+- name: Configure NFS storage recovery timer
+  ansible.builtin.template:
+    src: nfs-storage-recovery.timer.j2
+    dest: /etc/systemd/system/nfs-storage-recovery.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+  become: true
+
+- name: Ensure NFS server is enabled
+  ansible.builtin.systemd_service:
+    name: nfs-server
+    enabled: true
+  when:
+    - nfs_export_mounts.results
+        | selectattr('rc', 'equalto', 0)
+        | list
+        | length == nfs_export_mounts.results | length
+  become: true
+
+- name: Enable NFS storage recovery timer
+  ansible.builtin.systemd_service:
+    name: nfs-storage-recovery.timer
+    enabled: true
+    state: started
+  become: true

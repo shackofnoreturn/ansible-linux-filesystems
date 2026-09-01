@@ -1,0 +1,8 @@
+---
+nfs_server_package: nfs-kernel-server
+
+nfs_exports: []
+
+nfs_storage_mounts: []
+
+nfs_storage_recovery_interval: "30s"

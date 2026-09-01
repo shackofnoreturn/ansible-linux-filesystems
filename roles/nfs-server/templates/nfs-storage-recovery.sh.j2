@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -u
+
+STORAGE_AVAILABLE=true
+
+{% for mountpoint in nfs_storage_mounts %}
+if ! /usr/bin/mountpoint -q "{{ mountpoint }}"; then
+    STORAGE_AVAILABLE=false
+fi
+{% endfor %}
+
+if [ "$STORAGE_AVAILABLE" = false ]; then
+    if /usr/bin/systemctl is-active --quiet nfs-server.service; then
+        /usr/bin/logger -t nfs-storage-recovery \
+            "NFS storage unavailable; stopping NFS server"
+        /usr/bin/systemctl stop nfs-server.service
+    fi
+
+    exit 0
+fi
+
+if ! /usr/bin/systemctl is-active --quiet nfs-server.service; then
+    /usr/bin/logger -t nfs-storage-recovery \
+        "NFS storage available; starting NFS server"
+
+    /usr/bin/systemctl start nfs-server.service
+fi
+
+/usr/sbin/exportfs -ra
+
+/usr/bin/logger -t nfs-storage-recovery \
+    "NFS exports refreshed successfully"

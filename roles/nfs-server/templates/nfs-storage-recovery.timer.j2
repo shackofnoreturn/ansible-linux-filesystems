@@ -1,0 +1,11 @@
+[Unit]
+Description=Check NFS storage availability
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec={{ nfs_storage_recovery_interval }}
+AccuracySec=5s
+Unit=nfs-storage-recovery.service
+
+[Install]
+WantedBy=timers.target
