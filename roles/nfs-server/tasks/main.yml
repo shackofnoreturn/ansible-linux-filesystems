@@ -12,11 +12,22 @@
     state: stopped
   become: true
 
-- name: Check NFS export paths are mounted
+- name: Require storage mount paths when exports are configured
+  ansible.builtin.assert:
+    that:
+      - nfs_exports | length == 0 or nfs_storage_mounts | length > 0
+    fail_msg: >-
+      Configure nfs_storage_mounts with the mounted storage roots before
+      configuring NFS exports.
+
+- name: Check NFS storage paths are mounted
   ansible.builtin.command:
-    cmd: "mountpoint -q {{ item.path }}"
-  loop: "{{ nfs_exports }}"
-  register: nfs_export_mounts
+    argv:
+      - mountpoint
+      - -q
+      - "{{ item }}"
+  loop: "{{ nfs_storage_mounts }}"
+  register: nfs_storage_mount_status
   changed_when: false
   failed_when: false
   become: true
@@ -26,7 +37,7 @@
     name: nfs-server
     state: stopped
   when:
-    - nfs_export_mounts.results
+    - nfs_storage_mount_status.results
         | selectattr('rc', 'ne', 0)
         | list
         | length > 0
@@ -35,10 +46,10 @@
 - name: Refuse to configure exports for unmounted filesystems
   ansible.builtin.fail:
     msg: >-
-      NFS export {{ item.item.path }} is not mounted.
-      Refusing to export the directory.
+      NFS storage path {{ item.item }} is not mounted.
+      Refusing to configure exports.
       Is the JBOD/storage online?
-  loop: "{{ nfs_export_mounts.results }}"
+  loop: "{{ nfs_storage_mount_status.results }}"
   when: item.rc != 0
 
 - name: Configure NFS exports
@@ -87,10 +98,10 @@
     name: nfs-server
     enabled: true
   when:
-    - nfs_export_mounts.results
+    - nfs_storage_mount_status.results
         | selectattr('rc', 'equalto', 0)
         | list
-        | length == nfs_export_mounts.results | length
+        | length == nfs_storage_mount_status.results | length
   become: true
 
 - name: Enable NFS storage recovery timer
