@@ -2,5 +2,4 @@
 # Do not edit manually.
 
 {% for export in nfs_exports %}
-{{ export.path }}{% for client in export.clients %} {{ client.network }}({{ client.options }}){% endfor %}
-{% endfor %}
+{{ export.path }}{% for client in export.clients %} {{ client.network }}({{ client.options }}){% endfor %}{{ '\n' }}{% endfor %}
